@@ -96,13 +96,36 @@ func (self *Plotter) Cmd(format string, a ...interface{}) error {
 	return err
 }
 
+
+func (self *Plot1d) Cmd(format string, a ...interface{}) error {
+	cmd := fmt.Sprintf(format, a...) + "\n"
+	n, err := io.WriteString(self.proc.stdin, cmd)
+
+	if self.debug {
+		//buf := new(bytes.Buffer)
+		//io.Copy(buf, self.proc.handle.Stdout)
+		fmt.Printf("cmd> %v", cmd)
+		fmt.Printf("res> %v\n", n)
+	}
+
+	return err
+}
+
+
 // CheckedCmd is a convenience wrapper around Cmd: it will panic if the
 // error returned by Cmd isn't nil.
 // ex:
 //   fname := "foo.dat"
 //   p.CheckedCmd("plot %s", fname)
 func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
-	fmt.Println("Hello this is a print attempt\n\n")
+	err := self.Cmd(format, a...)
+	if err != nil {
+		err_string := fmt.Sprintf("** err: %v\n", err)
+		panic(err_string)
+	}
+}
+
+func (self *Plot1d) CheckedCmd(format string, a ...interface{}) {
 	err := self.Cmd(format, a...)
 	if err != nil {
 		err_string := fmt.Sprintf("** err: %v\n", err)
@@ -117,6 +140,15 @@ func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
 //   if err != nil { /* handle error */ }
 //   defer p.Close()
 func (self *Plotter) Close() (err error) {
+	if self.proc != nil && self.proc.handle != nil {
+		self.proc.stdin.Close()
+		err = self.proc.handle.Wait()
+	}
+	self.ResetPlot()
+	return err
+}
+
+func (self *Plot1d) Close() (err error) {
 	if self.proc != nil && self.proc.handle != nil {
 		self.proc.stdin.Close()
 		err = self.proc.handle.Wait()
@@ -419,6 +451,19 @@ func (self *Plotter) ResetPlot() (err error) {
 	return err
 }
 
+// ResetPlot clears up all plots and sets the Plotter state anew.
+func (self *Plot1d) ResetPlot() (err error) {
+	for fname, fhandle := range self.tmpfiles {
+		ferr := fhandle.Close()
+		if ferr != nil {
+			err = ferr
+		}
+		os.Remove(fname)
+	}
+	self.nplots = 0
+	return err
+}
+
 // NewPlotter creates a new Plotter instance.
 //  - `fname` is the name of the file containing commands (should be empty for now)
 //  - `persist` is a flag to run the gnuplot subprocess with '-persist' so the
@@ -433,7 +478,7 @@ func NewPlotter(fname string, persist, debug bool) (*Plotter, error) {
 	p := &Plotter{proc: nil, debug: debug, plotcmd: "plot",
 		nplots: 0, style: "points"}
 	p.tmpfiles = make(tmpfiles_db)
-
+fmt.Println("Testing point \n\n\n")
 	if fname != "" {
 		panic("NewPlotter with fname is not yet supported")
 	} else {
@@ -446,4 +491,71 @@ func NewPlotter(fname string, persist, debug bool) (*Plotter, error) {
 	return p, nil
 }
 
-/* EOF */
+
+type Vertex1D struct {
+	x float64
+}
+
+type Vertex2D struct {
+	x float64
+	y float64
+}
+
+type Vertex3D struct {
+	x float64
+	y float64
+	z float64
+}
+
+
+type Plot1d struct {
+	proc     *plotter_process
+	debug    bool
+	plotcmd  string
+	nplots   int    // number of currently active plots
+	style    string // current plotting style
+	tmpfiles tmpfiles_db
+}
+func Train( )  {
+	fmt.Println("This is mine")
+}
+
+func NewPlot( persist, debug bool) (*Plot1d, error) {
+	p := &Plot1d{proc: nil, debug: debug, plotcmd: "plot",
+		nplots: 0, style: "points"}
+	p.tmpfiles = make(tmpfiles_db)
+
+		proc, err := new_plotter_proc(persist)
+		if err != nil {
+			return nil, err
+		}
+		p.proc = proc
+	return p, nil
+}
+
+//  err = p.PlotX([]float64{10, 20, 30}, "my title")
+func (self *Plot1d) Plot(data []float64, title string) error {
+	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
+	if err != nil {
+		return err
+	}
+	fname := f.Name()
+	self.tmpfiles[fname] = f
+	for _, d := range data {
+		f.WriteString(fmt.Sprintf("%v\n", d))
+	}
+	cmd := self.plotcmd
+	if self.nplots > 0 {
+		cmd = "replot"
+	}
+
+	var line string
+	if title == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
+	} else {
+		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
+			cmd, fname, title, self.style)
+	}
+	self.nplots += 1
+	return self.Cmd(line)
+}
