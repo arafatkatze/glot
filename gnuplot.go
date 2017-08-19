@@ -3,7 +3,7 @@
 // See the gnuplot documentation page for the exact semantics of the gnuplot
 // commands.
 //  http://www.gnuplot.info/
-package gnuplot
+package glot
 
 import (
 	"errors"
