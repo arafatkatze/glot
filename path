@@ -1,8 +1,68 @@
 Test and docs working
 
-1-d Points class
+Make runtime polymorphism with 1,2,3 dimensions
 
 
 
-A 1-d,2-d, 3-d line class with tests
-Features like bubble and other beautiful things
+Function operator only for 1 dimenion
+Handling multiple lines within the same plot.
+
+Functions
+1. Bubble Line Linepoints  7 other types of line plots for one dimensional work
+2. Reset the whole plot
+3. Axis setting
+4. Interface cases within the same functions for different dimensions and erros incase they
+are not supported
+5. Histogram and smooth sinx cos x curve
+6. A 2d function with y as a func of x and a 3d function with z as a func of x,y
+7. Fill
+8. Logarithmic scale
+9 Scatter
+10. Contours Beautiful 3d surfaces built with functions
+11 MAndelbrot
+
+
+Interface
+Just a function with a set of values that can be implementted by literally any time
+of thing so the actual implementation depeneds on the type calling it.
+
+None of our required functions really have a return value but just an error is returned at best.
+
+Make an interface with different values and do reflect typeof to find the types.
+
+
+
+
+
+Make a plot struct with map between names and curves
+
+Make an inaccesible variable called dimensions that helps you identify your dimensions
+at a time and give errors accordingly and make functions.
+
+Have a reset function
+
+Have a fixed set of supported data types by the interface and have them typecasted to float64
+always
+
+Add an optinal parameter for debug value
+
+Remove and add curve to a plot using map
+Finally the plot button will plot your stuff
+
+Set curve style method
+Set curve axis method
+Just take the name of the curve and set the styles and everything
+
+Always have defaults and set by user
+
+Add functional curve method to add curves with functions
+Remove curve is the same
+
+
+Add bubble curve
+Add boxplot
+Add other types also
+reset curve will reset the values of a curve given its name
+delete curve will remove the curve
+Add check later if the slice is a perfect matrix
+Add a typecasting process later

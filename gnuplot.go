@@ -31,7 +31,6 @@ func init() {
 		fmt.Printf("** could not find path to 'gnuplot':\n%v\n", err)
 		panic("could not find 'gnuplot'")
 	}
-	fmt.Printf("-- found gnuplot command: %s\n", g_gnuplot_cmd)
 }
 
 type gnuplot_error struct {
@@ -52,7 +51,6 @@ func new_plotter_proc(persist bool) (*plotter_process, error) {
 	if persist {
 		proc_args = append(proc_args, "-persist")
 	}
-	fmt.Printf("--> [%v] %v\n", g_gnuplot_cmd, proc_args)
 	cmd := exec.Command(g_gnuplot_cmd, proc_args...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -97,21 +95,6 @@ func (self *Plotter) Cmd(format string, a ...interface{}) error {
 }
 
 
-func (self *Plot1d) Cmd(format string, a ...interface{}) error {
-	cmd := fmt.Sprintf(format, a...) + "\n"
-	n, err := io.WriteString(self.proc.stdin, cmd)
-
-	if self.debug {
-		//buf := new(bytes.Buffer)
-		//io.Copy(buf, self.proc.handle.Stdout)
-		fmt.Printf("cmd> %v", cmd)
-		fmt.Printf("res> %v\n", n)
-	}
-
-	return err
-}
-
-
 // CheckedCmd is a convenience wrapper around Cmd: it will panic if the
 // error returned by Cmd isn't nil.
 // ex:
@@ -125,13 +108,7 @@ func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
 	}
 }
 
-func (self *Plot1d) CheckedCmd(format string, a ...interface{}) {
-	err := self.Cmd(format, a...)
-	if err != nil {
-		err_string := fmt.Sprintf("** err: %v\n", err)
-		panic(err_string)
-	}
-}
+
 
 // Close makes sure all resources used by the gnuplot subprocess are reclaimed.
 // This method is typically called when the Plotter instance is not needed
@@ -148,14 +125,7 @@ func (self *Plotter) Close() (err error) {
 	return err
 }
 
-func (self *Plot1d) Close() (err error) {
-	if self.proc != nil && self.proc.handle != nil {
-		self.proc.stdin.Close()
-		err = self.proc.handle.Wait()
-	}
-	self.ResetPlot()
-	return err
-}
+
 
 // PlotNd will create an n-dimensional plot (up to 3) with a title `title`
 // and using the data from the var-arg `data`.
@@ -186,7 +156,7 @@ func (self *Plotter) PlotNd(title string, data ...[]float64) error {
 // and its correspinding value as the y-coordinate.
 // Example:
 //  err = p.PlotX([]float64{10, 20, 30}, "my title")
-func (self *Plotter) PlotX(data []float64, title string) error {
+func (self *Plotter) PlotX(data []float64, title string, params ...bool) error {
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
 		return err
@@ -365,12 +335,12 @@ func (self *Plotter) SetStyle(style string) (err error) {
 	allowed := []string{
 		"lines", "points", "linepoints",
 		"impulses", "dots",
-		"steps",
+		"steps", "fill solid",
 		"errorbars",
-		"boxes",
+		"boxes", "lp",
 		"boxerrorbars",
 		"pm3d"}
-
+	fmt.Println("These are dots")
 	for _, s := range allowed {
 		if s == style {
 			self.style = style
@@ -451,18 +421,7 @@ func (self *Plotter) ResetPlot() (err error) {
 	return err
 }
 
-// ResetPlot clears up all plots and sets the Plotter state anew.
-func (self *Plot1d) ResetPlot() (err error) {
-	for fname, fhandle := range self.tmpfiles {
-		ferr := fhandle.Close()
-		if ferr != nil {
-			err = ferr
-		}
-		os.Remove(fname)
-	}
-	self.nplots = 0
-	return err
-}
+
 
 // NewPlotter creates a new Plotter instance.
 //  - `fname` is the name of the file containing commands (should be empty for now)
@@ -478,7 +437,6 @@ func NewPlotter(fname string, persist, debug bool) (*Plotter, error) {
 	p := &Plotter{proc: nil, debug: debug, plotcmd: "plot",
 		nplots: 0, style: "points"}
 	p.tmpfiles = make(tmpfiles_db)
-fmt.Println("Testing point \n\n\n")
 	if fname != "" {
 		panic("NewPlotter with fname is not yet supported")
 	} else {
@@ -490,7 +448,6 @@ fmt.Println("Testing point \n\n\n")
 	}
 	return p, nil
 }
-
 
 type Vertex1D struct {
 	x float64
@@ -508,33 +465,63 @@ type Vertex3D struct {
 }
 
 
-type Plot1d struct {
-	proc     *plotter_process
-	debug    bool
-	plotcmd  string
-	nplots   int    // number of currently active plots
-	style    string // current plotting style
-	tmpfiles tmpfiles_db
-}
-func Train( )  {
-	fmt.Println("This is mine")
+type Plot struct {
+	proc       *plotter_process
+	debug      bool
+	plotcmd    string
+	nplots     int    // number of currently active plots
+	tmpfiles   tmpfiles_db
+	dimensions int
+	curves     map[string]Curve
+	format     string
+	style      string
 }
 
-func NewPlot( persist, debug bool) (*Plot1d, error) {
-	p := &Plot1d{proc: nil, debug: debug, plotcmd: "plot",
-		nplots: 0, style: "points"}
+
+type Curve struct {
+	name         string
+	dimensions   int
+	style        string // current plotting style
+	data         interface{}
+	labels       [3]string
+	set          bool
+	axisx        [2]float64
+	axisy        [2]float64
+	axisz        [2]float64
+}
+
+func (self *Plot) Addcurve(name string, data interface{}) (err error) {
+	curve := &Curve{name: name, dimensions: self.dimensions, data: data, set: true}
+	fmt.Println(curve)
+	switch data.(type) {
+	case [][]float64:
+		fmt.Println("1")
+	case []float64:
+		 fmt.Println("Cool")
+			self.PlotX(data.([]float64), "This is mine")
+		default:
+ return  &gnuplot_error{fmt.Sprintf("invalid number of dims ")}
+	}
+	return err
+}
+
+func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
+	p := &Plot{proc: nil, debug: debug, plotcmd: "plot",
+		nplots: 0, dimensions: dimensions, style: "points"}
 	p.tmpfiles = make(tmpfiles_db)
-
-		proc, err := new_plotter_proc(persist)
-		if err != nil {
-			return nil, err
-		}
-		p.proc = proc
+	proc, err := new_plotter_proc(persist)
+	if err != nil {
+		return nil, err
+	}
+	if dimensions > 3 || dimensions < 1 {
+		return nil, &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", dimensions)}
+	}
+	p.proc = proc
 	return p, nil
+
 }
 
-//  err = p.PlotX([]float64{10, 20, 30}, "my title")
-func (self *Plot1d) Plot(data []float64, title string) error {
+func (self *Plot) PlotX(data []float64, title string, params ...bool) error {
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
 		return err
@@ -544,6 +531,7 @@ func (self *Plot1d) Plot(data []float64, title string) error {
 	for _, d := range data {
 		f.WriteString(fmt.Sprintf("%v\n", d))
 	}
+	f.Close()
 	cmd := self.plotcmd
 	if self.nplots > 0 {
 		cmd = "replot"
@@ -559,3 +547,25 @@ func (self *Plot1d) Plot(data []float64, title string) error {
 	self.nplots += 1
 	return self.Cmd(line)
 }
+
+func (self *Plot) Cmd(format string, a ...interface{}) error {
+	cmd := fmt.Sprintf(format, a...) + "\n"
+	n, err := io.WriteString(self.proc.stdin, cmd)
+
+	if self.debug {
+		//buf := new(bytes.Buffer)
+		//io.Copy(buf, self.proc.handle.Stdout)
+		fmt.Printf("cmd> %v", cmd)
+		fmt.Printf("res> %v\n", n)
+	}
+
+		return err
+	}
+
+	func (self *Plot) CheckedCmd(format string, a ...interface{}) {
+		err := self.Cmd(format, a...)
+		if err != nil {
+			err_string := fmt.Sprintf("** err: %v\n", err)
+			panic(err_string)
+		}
+	}
