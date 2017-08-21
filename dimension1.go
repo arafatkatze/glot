@@ -21,25 +21,21 @@ type Plot struct {
 	title      string
 }
 
+// Curve ...
 type Curve struct {
-	name        string
-	dimensions  int
-	style       string // current plotting style
-	data        interface{}
-	casted_data interface{}
-	labels      [3]string
-	set         bool
-	axisx       [2]float64
-	axisy       [2]float64
-	axisz       [2]float64
+	name       string
+	dimensions int
+	style      string // current plotting style
+	data       interface{}
+	castedData interface{}
+	labels     [3]string
+	set        bool
 }
-
-
 
 func (self *Plot) Addcurve(name string, style string, data interface{}) (err error) {
 	_, exists := self.Curves[name]
 	if exists {
-			return &gnuplot_error{fmt.Sprintf("A curve with the name %s  already exists, please use another name of the curve or remove this curve before using another one with the same name.", name)}
+		return &gnuplot_error{fmt.Sprintf("A curve with the name %s  already exists, please use another name of the curve or remove this curve before using another one with the same name.", name)}
 	}
 
 	curve := &Curve{name: name, dimensions: self.dimensions, data: data, set: true}
@@ -49,87 +45,237 @@ func (self *Plot) Addcurve(name string, style string, data interface{}) (err err
 		"steps", "fill solid", "histogram",
 		"errorbars",
 		"boxes", "lp"}
-		curve.style = "points"
-		discovered := 0
-		for _, s := range allowed {
-			if s == style {
-				curve.style = style
-				err = nil
-				discovered = 1
-			}
+	curve.style = "points"
+	discovered := 0
+	for _, s := range allowed {
+		if s == style {
+			curve.style = style
+			err = nil
+			discovered = 1
 		}
-
+	}
+	fmt.Println("Points passed")
 	switch data.(type) {
 	case [][]float64:
-		curve.casted_data = data.([]float64)
-		self.PlotX(curve)
+
+		fmt.Println("This is a place")
+		if self.dimensions != len(data.([][]float64)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		curve.castedData = data.([][]float64)
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
 		self.Curves[name] = curve
+
+	case [][]float32:
+		if self.dimensions != len(data.([][]float32)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]float32)
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
+	case [][]int:
+		if self.dimensions != len(data.([][]int)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]int)
+		if len(originalSlice) != 2 {
+			return &gnuplot_error{fmt.Sprintf("this is not a 2d matrix")}
+		}
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
+	case [][]int8:
+		if self.dimensions != len(data.([][]int8)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]int8)
+		if len(originalSlice) != 2 {
+			return &gnuplot_error{fmt.Sprintf("this is not a 2d matrix")}
+		}
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
+	case [][]int16:
+		if self.dimensions != len(data.([][]int16)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]int16)
+		if len(originalSlice) != 2 {
+			return &gnuplot_error{fmt.Sprintf("this is not a 2d matrix")}
+		}
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
+	case [][]int32:
+		if self.dimensions != len(data.([][]int32)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]int32)
+		if len(originalSlice) != 2 {
+			return &gnuplot_error{fmt.Sprintf("this is not a 2d matrix")}
+		}
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
+	case [][]int64:
+		if self.dimensions != len(data.([][]int64)) {
+			return &gnuplot_error{fmt.Sprintf("The dimensions of this curve are not compatible with the dimensions of the plot.\nIf you want to make a 2-d curve you must specify a 2-d plot.")}
+		}
+		originalSlice := data.([][]int64)
+		if len(originalSlice) != 2 {
+			return &gnuplot_error{fmt.Sprintf("this is not a 2d matrix")}
+		}
+		typeCasteSlice := make([][]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = make([]float64, len(originalSlice[i]))
+			for j := 0; j < len(originalSlice[i]); j++ {
+				typeCasteSlice[i][j] = float64(originalSlice[i][j])
+			}
+		}
+		curve.castedData = typeCasteSlice
+
+		if self.dimensions == 2 {
+			self.PlotXY(curve)
+		} else {
+			self.PlotXYZ(curve)
+		}
+		self.Curves[name] = curve
+
 	case []float64:
-		curve.casted_data = data.([]float64)
+		curve.castedData = data.([]float64)
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []float32:
-		original_slice := data.([]float32)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]float32)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []int:
-		original_slice := data.([]int)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]int)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []int8:
-		original_slice := data.([]int8)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]int8)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []int16:
-		original_slice := data.([]int16)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]int16)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []int32:
-		original_slice := data.([]int32)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]int32)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	case []int64:
-		original_slice := data.([]int64)
-		type_casted_slice := make([]float64, len(original_slice))
-		for i := 0; i < len(original_slice); i++ {
-			type_casted_slice[i] = float64(original_slice[i])
+		originalSlice := data.([]int64)
+		typeCasteSlice := make([]float64, len(originalSlice))
+		for i := 0; i < len(originalSlice); i++ {
+			typeCasteSlice[i] = float64(originalSlice[i])
 		}
-		curve.casted_data = type_casted_slice
+		curve.castedData = typeCasteSlice
 		self.PlotX(curve)
 		self.Curves[name] = curve
 	default:
 		return &gnuplot_error{fmt.Sprintf("invalid number of dims ")}
+
 	}
-if discovered == 0 {
-	fmt.Printf("** style '%v' not in allowed list %v\n", style, allowed)
-	fmt.Printf("** default to 'points'\n")
-	err = &gnuplot_error{fmt.Sprintf("invalid style '%s'", style)}
-}
+	if discovered == 0 {
+		fmt.Printf("** style '%v' not in allowed list %v\n", style, allowed)
+		fmt.Printf("** default to 'points'\n")
+		err = &gnuplot_error{fmt.Sprintf("invalid style '%s'", style)}
+	}
 	return err
 }
 
@@ -162,7 +308,7 @@ func (self *Plot) PlotX(curves *Curve) error {
 	}
 	fname := f.Name()
 	self.tmpfiles[fname] = f
-	for _, d := range curves.casted_data.([]float64) {
+	for _, d := range curves.castedData.([]float64) {
 		f.WriteString(fmt.Sprintf("%v\n", d))
 	}
 	f.Close()
@@ -170,9 +316,79 @@ func (self *Plot) PlotX(curves *Curve) error {
 	if self.nplots > 0 {
 		cmd = "replot"
 	}
- if curves.style == "" {
+	if curves.style == "" {
 		curves.style = "points"
 	}
+	var line string
+	if curves.name == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, curves.style)
+	} else {
+		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
+			cmd, fname, curves.name, curves.style)
+	}
+	self.nplots++
+	return self.Cmd(line)
+}
+
+func (self *Plot) PlotXY(curves *Curve) error {
+	x := curves.castedData.([][]float64)[0]
+	y := curves.castedData.([][]float64)[1]
+	npoints := min(len(x), len(y))
+
+	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
+	if err != nil {
+		return err
+	}
+	fname := f.Name()
+	self.tmpfiles[fname] = f
+
+	for i := 0; i < npoints; i++ {
+		f.WriteString(fmt.Sprintf("%v %v\n", x[i], y[i]))
+	}
+
+	f.Close()
+	cmd := self.plotcmd
+	if self.nplots > 0 {
+		cmd = "replot"
+	}
+
+	if curves.style == "" {
+		curves.style = "points"
+	}
+	var line string
+	if curves.name == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, curves.style)
+	} else {
+		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
+			cmd, fname, curves.name, curves.style)
+	}
+	self.nplots += 1
+	return self.Cmd(line)
+}
+
+func (self *Plot) PlotXYZ(curves *Curve) error {
+	x := curves.castedData.([][]float64)[0]
+	y := curves.castedData.([][]float64)[1]
+	z := curves.castedData.([][]float64)[2]
+	npoints := min(len(x), len(y))
+	npoints = min(npoints, len(z))
+	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
+	if err != nil {
+		return err
+	}
+	fname := f.Name()
+	self.tmpfiles[fname] = f
+
+	for i := 0; i < npoints; i++ {
+		f.WriteString(fmt.Sprintf("%v %v %v\n", x[i], y[i], z[i]))
+	}
+
+	f.Close()
+	cmd := "splot" // Force 3D plot
+	if self.nplots > 0 {
+		cmd = "replot"
+	}
+
 	var line string
 	if curves.name == "" {
 		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, curves.style)
@@ -233,25 +449,24 @@ func (self *Plot) ResetPlot() (err error) {
 	return err
 }
 
-func (self *Plot) Removecurve(name string){
-	 delete(self.Curves, name);
-		self.cleanplot()
-		for _, curve := range self.Curves {
-			  self.PlotX(curve)
-		}
+func (self *Plot) Removecurve(name string) {
+	delete(self.Curves, name)
+	self.cleanplot()
+	for _, curve := range self.Curves {
+		self.PlotX(curve)
+	}
 }
 
 func (self *Plot) Resetcurvestyle(name string, style string) (err error) {
-	 curve, exists := self.Curves[name]
-		if !exists {
-				return &gnuplot_error{fmt.Sprintf("A curve with name %s does not exist.", name)}
-		}
-	 self.Removecurve(name);
-		curve.style = style
-		self.PlotX(curve)
-		return err
+	curve, exists := self.Curves[name]
+	if !exists {
+		return &gnuplot_error{fmt.Sprintf("A curve with name %s does not exist.", name)}
+	}
+	self.Removecurve(name)
+	curve.style = style
+	self.PlotX(curve)
+	return err
 }
-
 
 func (self *Plot) Close() (err error) {
 	if self.proc != nil && self.proc.handle != nil {
@@ -262,10 +477,9 @@ func (self *Plot) Close() (err error) {
 	return err
 }
 
-
 func (self *Plot) SavePlot(filename string) (err error) {
 	if self.nplots == 0 {
-		return  &gnuplot_error{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
+		return &gnuplot_error{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
 	}
 	output_format := "set terminal " + self.format
 	self.CheckedCmd(output_format)
@@ -275,7 +489,32 @@ func (self *Plot) SavePlot(filename string) (err error) {
 	return nil
 }
 
+func (self *Plot) AddFunc2d(name string, style string, x []float64, fct Func) error {
+	y := x
+	for index, _ := range x {
+		y[index] = fct(x[index])
+	}
+	combined := [][]float64{}
+	combined = append(combined, x)
+	combined = append(combined, y)
+	fmt.Println("Adding the 2d functional curve")
+	self.Addcurve(name, style, combined)
+	return nil
+}
 
+func (self *Plot) AddFunc3d(name string, style string, x []float64, y []float64, fct Func3d) error {
+	z := x
+	for index := range x {
+		z[index] = fct(x[index], y[index])
+	}
+	combined := [][]float64{}
+	combined = append(combined, x)
+	combined = append(combined, y)
+	combined = append(combined, z)
+	fmt.Println("Adding the 3d functional curve")
+	self.Addcurve(name, style, combined)
+	return nil
+}
 
 func (self *Plot) PlotFunc(data []float64, fct Func, title string) error {
 
@@ -335,12 +574,10 @@ func (self *Plot) SetZrange(start int, end int) error {
 	return self.Cmd(fmt.Sprintf("set zrange [%d:%d]", start, end))
 }
 
-
 // SetZLabel changes the label for the z-axis
 func (self *Plot) SetZLabel(label string) error {
-return self.Cmd(fmt.Sprintf("set xlabel '%s'", label))
+	return self.Cmd(fmt.Sprintf("set xlabel '%s'", label))
 }
-
 
 func (self *Plot) SetLabels(labels ...string) error {
 	ndims := len(labels)

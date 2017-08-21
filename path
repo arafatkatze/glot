@@ -1,12 +1,6 @@
 Test and docs working
 Functions
 1. Bubble Line Linepoints  7 other types of line plots for one dimensional work
-2. Reset the whole plot
-3. Axis setting
-4. Interface cases within the same functions for different dimensions and erros incase they
-are not supported
-5. Histogram and smooth sinx cos x curve
-6. A 2d function with y as a func of x and a 3d function with z as a func of x,y
 7. Fill
 8. Logarithmic scale
 9 Scatter
@@ -14,6 +8,5 @@ are not supported
 11 MAndelbrot
 
 Add bubble curve
-Add boxplot
 Add other types also
 Add check later if the slice is a perfect matrix

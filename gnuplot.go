@@ -263,6 +263,8 @@ func (self *Plotter) PlotXYZ(x, y, z []float64, title string) error {
 
 // Func is a 1-d function which can be plotted with gnuplot
 type Func func(x float64) float64
+type Func2d func(x float64) float64
+type Func3d func(x float64, y float64) float64
 
 // PlotFunc will create a 2-d plot using `data` as x-coordinates and `fct(x[i])`
 // as the y-coordinates.
