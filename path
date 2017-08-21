@@ -1,12 +1,7 @@
-Test and docs working
-Functions
-1. Bubble Line Linepoints  7 other types of line plots for one dimensional work
-7. Fill
-8. Logarithmic scale
-9 Scatter
-10. Contours Beautiful 3d surfaces built with functions
-11 MAndelbrot
-
-Add bubble curve
-Add other types also
-Add check later if the slice is a perfect matrix
+Docs
+Tests
+Types -> Tick Marks, Box plot
+Types -> Bubble Fill Scatter and others
+Contour
+Logarithmic and other Scales
+Beautiful Plot
