@@ -17,9 +17,11 @@ import (
 // Every plot has a set of Pointgroups that are simultaneously plotted
 // on a 2/3 D plane given the plot type.
 // The Plot dimensions must be specified at the time of construction
-// and can't be changed later.  All the curves added to a plot must
+// and can't be changed later.  All the Pointgroups added to a plot must
 // have same dimensions as the dimension specified at the
 // the time of plot construction.
+// The Pointgroups can be dynamically added and removed from a plot
+// And style changes can also be made dynamically.
 type Plot struct {
 	proc       *plotterProcess
 	debug      bool
@@ -33,30 +35,35 @@ type Plot struct {
 	title      string                 // The title of the plot.
 }
 
+// NewPlot Function makes a new plot with the specified dimensions.
 //
+// Usage
+//  dimensions := 3
+//  persist := false
+//  debug := false
+//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+// Variable definitions
+//  dimensions  :=> refers to the dimensions of the plot.
+//  debug       :=> can be used by developers to check the actual commands sent to gnu plot.
+//  persist     :=> used to make the gnu plot window stay open.
 func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
 	p := &Plot{proc: nil, debug: debug, plotcmd: "plot",
 		nplots: 0, dimensions: dimensions, style: "points", format: "png"}
-	if dimensions == 1 {
-		p.style = defaultStyle // Default style for a 1d plot.
-	}
 	p.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
 	p.tmpfiles = make(tmpfilesDb)
 	proc, err := newPlotterProc(persist)
 	if err != nil {
 		return nil, err
 	}
-
-	// Only 1,2,3 Dimensional curves are supported
+	// Only 1,2,3 Dimensional plots are supported
 	if dimensions > 3 || dimensions < 1 {
 		return nil, &gnuplotError{fmt.Sprintf("invalid number of dims '%v'", dimensions)}
 	}
 	p.proc = proc
 	return p, nil
-
 }
 
-func (plot *Plot) PlotX(PointGroup *PointGroup) error {
+func (plot *Plot) plotX(PointGroup *PointGroup) error {
 	f, err := ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
 	if err != nil {
 		return err
@@ -69,7 +76,7 @@ func (plot *Plot) PlotX(PointGroup *PointGroup) error {
 	f.Close()
 	cmd := plot.plotcmd
 	if plot.nplots > 0 {
-		cmd = "replot"
+		cmd = plotCommand
 	}
 	if PointGroup.style == "" {
 		PointGroup.style = defaultStyle
@@ -85,7 +92,7 @@ func (plot *Plot) PlotX(PointGroup *PointGroup) error {
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) PlotXY(PointGroup *PointGroup) error {
+func (plot *Plot) plotXY(PointGroup *PointGroup) error {
 	x := PointGroup.castedData.([][]float64)[0]
 	y := PointGroup.castedData.([][]float64)[1]
 	npoints := min(len(x), len(y))
@@ -104,7 +111,7 @@ func (plot *Plot) PlotXY(PointGroup *PointGroup) error {
 	f.Close()
 	cmd := plot.plotcmd
 	if plot.nplots > 0 {
-		cmd = "replot"
+		cmd = plotCommand
 	}
 
 	if PointGroup.style == "" {
@@ -121,7 +128,7 @@ func (plot *Plot) PlotXY(PointGroup *PointGroup) error {
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) PlotXYZ(points *PointGroup) error {
+func (plot *Plot) plotXYZ(points *PointGroup) error {
 	x := points.castedData.([][]float64)[0]
 	y := points.castedData.([][]float64)[1]
 	z := points.castedData.([][]float64)[2]
@@ -141,7 +148,7 @@ func (plot *Plot) PlotXYZ(points *PointGroup) error {
 	f.Close()
 	cmd := "splot" // Force 3D plot
 	if plot.nplots > 0 {
-		cmd = "replot"
+		cmd = plotCommand
 	}
 
 	var line string

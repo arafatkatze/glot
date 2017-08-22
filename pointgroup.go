@@ -18,6 +18,14 @@ type PointGroup struct {
 
 // AddPointGroup function adds a group of points to a plot.
 //
+// Usage
+//  dimensions := 2
+//  persist := false
+//  debug := false
+//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+//  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
+//  plot.AddPointGroup("Sample2", "points", []int32{1, 2, 4, 11})
+//  plot.SavePlot("1.png")
 func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (err error) {
 	_, exists := plot.PointGroup[name]
 	if exists {
@@ -47,9 +55,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		}
 		curve.castedData = data.([][]float64)
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -67,9 +75,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		}
 		curve.castedData = typeCasteSlice
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -90,9 +98,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		}
 		curve.castedData = typeCasteSlice
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -114,9 +122,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		curve.castedData = typeCasteSlice
 
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -138,9 +146,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		curve.castedData = typeCasteSlice
 
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -162,9 +170,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		curve.castedData = typeCasteSlice
 
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
@@ -186,15 +194,15 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 		curve.castedData = typeCasteSlice
 
 		if plot.dimensions == 2 {
-			plot.PlotXY(curve)
+			plot.plotXY(curve)
 		} else {
-			plot.PlotXYZ(curve)
+			plot.plotXYZ(curve)
 		}
 		plot.PointGroup[name] = curve
 
 	case []float64:
 		curve.castedData = data.([]float64)
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []float32:
 		originalSlice := data.([]float32)
@@ -203,7 +211,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []int:
 		originalSlice := data.([]int)
@@ -212,7 +220,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []int8:
 		originalSlice := data.([]int8)
@@ -221,7 +229,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []int16:
 		originalSlice := data.([]int16)
@@ -230,7 +238,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []int32:
 		originalSlice := data.([]int32)
@@ -239,7 +247,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	case []int64:
 		originalSlice := data.([]int64)
@@ -248,7 +256,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 			typeCasteSlice[i] = float64(originalSlice[i])
 		}
 		curve.castedData = typeCasteSlice
-		plot.PlotX(curve)
+		plot.plotX(curve)
 		plot.PointGroup[name] = curve
 	default:
 		return &gnuplotError{fmt.Sprintf("invalid number of dims ")}
@@ -262,22 +270,43 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 	return err
 }
 
-func (plot *Plot) Removecurve(name string) {
+// RemovePointGroup helps to remove a particular point group from the plot.
+// This way you can remove a pointgroup if it's un-necessary.
+//
+// Usage
+//  dimensions := 3
+//  persist := false
+//  debug := false
+//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+//  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
+//  plot.AddPointGroup("Sample2", "points", []int32{1, 2, 4, 11})
+//  plot.RemovePointGroup("Sample1")
+func (plot *Plot) RemovePointGroup(name string) {
 	delete(plot.PointGroup, name)
 	plot.cleanplot()
 	for _, pointGroup := range plot.PointGroup {
-		plot.PlotX(pointGroup)
+		plot.plotX(pointGroup)
 	}
 }
 
 // ResetPointGroupStyle helps to reset the style of a particular point group in a plot.
+// Using both AddPointGroup and RemovePointGroup you can add or remove point groups.
+// And dynamically change the plots.
+//
+// Usage
+//  dimensions := 2
+//  persist := false
+//  debug := false
+//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+//  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
+//  plot.ResetPointGroupStyle("Sample1", "points")
 func (plot *Plot) ResetPointGroupStyle(name string, style string) (err error) {
 	pointGroup, exists := plot.PointGroup[name]
 	if !exists {
 		return &gnuplotError{fmt.Sprintf("A curve with name %s does not exist.", name)}
 	}
-	plot.Removecurve(name)
+	plot.RemovePointGroup(name)
 	pointGroup.style = style
-	plot.PlotX(pointGroup)
+	plot.plotX(pointGroup)
 	return err
 }

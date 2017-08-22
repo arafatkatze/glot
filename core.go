@@ -11,6 +11,7 @@ var gGnuplotCmd string
 var gGnuplotPrefix = "go-gnuplot-"
 
 const defaultStyle = "points" // The default style for a curve
+const plotCommand = "replot"  // The default style for a curve
 
 func min(a, b int) int {
 	if a < b {
@@ -78,6 +79,11 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 	return err
 }
 
+// CheckedCmd is a convenience wrapper around Cmd: it will panic if the
+// error returned by Cmd isn't nil.
+// ex:
+//   fname := "foo.dat"
+//   p.CheckedCmd("plot %s", fname)
 func (plot *Plot) CheckedCmd(format string, a ...interface{}) {
 	err := plot.Cmd(format, a...)
 	if err != nil {
@@ -110,9 +116,12 @@ func (plot *Plot) cleanplot() (err error) {
 	return err
 }
 
+// ResetPlot is used to reset the whole plot.
+// This removes all the PointGroup's from the plot and makes it new.
+// Usage
+//  plot.ResetPlot()
 func (plot *Plot) ResetPlot() (err error) {
 	plot.cleanplot()
 	plot.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
-
 	return err
 }

@@ -2,7 +2,7 @@ package glot
 
 import "testing"
 
-func TestAverage(t *testing.T) {
+func TestMin(t *testing.T) {
 	var v int
 	v = min(1, 2)
 	if v != 1 {
