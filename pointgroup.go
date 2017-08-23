@@ -35,9 +35,9 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 	curve := &PointGroup{name: name, dimensions: plot.dimensions, data: data, set: true}
 	allowed := []string{
 		"lines", "points", "linepoints",
-		"impulses", "dots",
-		"steps", "fill solid", "histogram",
-		"errorbars",
+		"impulses", "dots", "bar",
+		"steps", "fill solid", "histogram", "circle",
+		"errorbars", "boxerrorbars",
 		"boxes", "lp"}
 	curve.style = defaultStyle
 	discovered := 0

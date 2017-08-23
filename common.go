@@ -115,6 +115,20 @@ func (plot *Plot) SetXrange(start int, end int) error {
 	return plot.Cmd(fmt.Sprintf("set xrange [%d:%d]", start, end))
 }
 
+// SetLogscale changes the label for the x-axis
+//
+// Usage
+//  dimensions := 3
+//  persist := false
+//  debug := false
+//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+//  plot.SetYrange(-2, 18)
+//  plot.AddPointGroup("rates", "circle", [][]float64{{2, 4, 8, 16, 32}, {4, 7, 4, 10, 3}})
+//  plot.SetLogscale("x", 2)
+func (plot *Plot) SetLogscale(axis string, base int) error {
+	return plot.Cmd(fmt.Sprintf("set logscale %s %d", axis, base))
+}
+
 // SetYrange changes the label for the y-axis
 //
 // Usage
