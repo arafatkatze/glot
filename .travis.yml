@@ -1,4 +1,4 @@
-sudo: enabled
+sudo: false
 
 language: go
 
