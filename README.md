@@ -10,7 +10,8 @@ Documentation is available at [godoc](https://godoc.org/github.com/Arafatk/glot)
 1. Install gnu plot by downloading from [source](https://sourceforge.net/projects/gnuplot/files/gnuplot/).    
 And then do ```go get github.com/Arafatk/glot ```   
 
-2. ```
+2.    
+```
 sudo apt-get update
 sudo apt-get install gnuplot-x11   
 go get github.com/Arafatk/glot
