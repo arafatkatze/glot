@@ -1,4 +1,4 @@
-# glot
+# glot ![Build Status](https://travis-ci.org/Arafatk/glot.svg?branch=master) ![GoDoc](https://godoc.org/github.com/arafat/glot?status.svg)
 Glot is a plotting library for Golang built on top of gnuplot.
 
 ## Documentation
