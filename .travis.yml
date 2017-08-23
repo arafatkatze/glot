@@ -17,7 +17,8 @@ env:
   global:
    - DISPLAY: ":99.0"
 before_install:
- -  sudo apt-get install gnuplot-x11  
+ - sudo apt-get -qq update
+ - sudo apt-get install -y  gnuplot-x11  
  
  script:
  - go get -d -t -v ./...
