@@ -1,0 +1,27 @@
+sudo: true
+
+language: go
+
+# Versions of go that are explicitly supported by gonum.
+go:
+ - 1.6.x
+ - 1.7.x
+ - 1.8.x
+ - master
+matrix:
+  fast_finish: true
+  allow_failures:
+    - go: master
+
+env:
+  global:
+   - DISPLAY: ":99.0"
+before_install:
+ -  sudo apt-get install gnuplot-x11  
+ 
+ script:
+ - go get -d -t -v ./...
+ - go build -v ./...
+ - go test -v ./...
+ - test -z "$(gofmt -d .)"
+ - if [[ $TRAVIS_SECURE_ENV_VARS = "true" ]]; then bash ./.travis/test-coverage.sh; fi
