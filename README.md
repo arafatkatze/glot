@@ -4,6 +4,8 @@ Glot is a plotting library for Golang built on top of gnuplot.
 ## Documentation
 Documentation is available at [godoc](https://godoc.org/github.com/Arafatk/glot).      
 
+## Blog Post    
+[Medium](https://medium.com/@Arafat./introducing-glot-the-plotting-library-for-golang-3133399948a1)
 
 ## Installation     
 
