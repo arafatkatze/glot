@@ -1,4 +1,4 @@
-# glot ![Build Status](https://travis-ci.org/Arafatk/glot.svg?branch=master) [![GoDoc](https://godoc.org/github.com/arafat/glot?status.svg)](https://godoc.org/github.com/Arafatk/glot)  [![Join the chat at https://gitter.im/tensorflowrb/Lobby](https://badges.gitter.im/tensorflowrb/Lobby.svg)](https://gitter.im/glot-dev/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+# glot [![Build Status](https://travis-ci.org/Arafatk/glot.svg?branch=master)](https://travis-ci.org/Arafatk/glot) [![GoDoc](https://godoc.org/github.com/arafat/glot?status.svg)](https://godoc.org/github.com/Arafatk/glot)  [![Join the chat at https://gitter.im/tensorflowrb/Lobby](https://badges.gitter.im/tensorflowrb/Lobby.svg)](https://gitter.im/glot-dev/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 Glot is a plotting library for Golang built on top of gnuplot.
 
 ## Documentation
