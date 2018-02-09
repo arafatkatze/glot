@@ -1,4 +1,5 @@
- [![Build Status](https://travis-ci.org/Arafatk/glot.svg?branch=master)](https://travis-ci.org/Arafatk/glot) [![GoDoc](https://godoc.org/github.com/arafat/glot?status.svg)](https://godoc.org/github.com/Arafatk/glot) [![Join the chat at https://gitter.im/tensorflowrb/Lobby](https://badges.gitter.im/tensorflowrb/Lobby.svg)](https://gitter.im/glot-dev/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+ [![Build Status](https://travis-ci.org/Arafatk/glot.svg?branch=master)](https://travis-ci.org/Arafatk/glot) [![GoDoc](https://godoc.org/github.com/arafat/glot?status.svg)](https://godoc.org/github.com/Arafatk/glot) [![Join the chat at https://gitter.im/tensorflowrb/Lobby](https://badges.gitter.im/tensorflowrb/Lobby.svg)](https://gitter.im/glot-dev/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)  ![License](https://img.shields.io/badge/License-MIT-blue.svg)  
+
 # Glot
 `glot` is a plotting library for Golang built on top of [gnuplot](http://www.gnuplot.info/). `glot` currently supports styles like lines, points, bars, steps, histogram, circle, and many others. We are continuously making efforts to add more features.  
 
@@ -26,5 +27,5 @@ We have a blog post explaining our vision and covering some basic usage of the `
 ![](https://raw.githubusercontent.com/Arafatk/plot/master/Screenshot%20-%20Saturday%2014%20October%202017%20-%2004-51-13%20%20IST.png)
 
 ## Contributing
-We really encourage developers coming in, finding a bug or requesting a new feature. Want to tell us about the feature you just implemented, just raise a pull request and we'll be happy to go through it. 
+We really encourage developers coming in, finding a bug or requesting a new feature. Want to tell us about the feature you just implemented, just raise a pull request and we'll be happy to go through it. Please read the CONTRIBUTING and CODE_OF_CONDUCT file.
 
