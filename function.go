@@ -30,7 +30,7 @@ type Func3d func(x float64, y float64) float64
 //  pointsX     :=> The x Value of the points to be plotted.  y = func(x) is plotted on the curve.
 //  style       :=> Style of the curve
 // NOTE: Currently only float64 type is supported for this function
-func (plot *Plot) AddFunc2d(name string, style string, x []float64, fct Func2d) error {
+func (plot *Plot) AddFunc2d(name string, style PointStyle, x []float64, fct Func2d) error {
 	y := make([]float64, len(x))
 	for index := range x {
 		y[index] = fct(x[index])
@@ -67,7 +67,7 @@ func (plot *Plot) AddFunc2d(name string, style string, x []float64, fct Func2d) 
 //  style       :=> Style of the curve
 //  pointsX     :=> The x Value of the points to be plotted.  y = func(x) is plotted on the curve.
 // NOTE: Currently only float64 type is supported for this function
-func (plot *Plot) AddFunc3d(name string, style string, x []float64, y []float64, fct Func3d) error {
+func (plot *Plot) AddFunc3d(name string, style PointStyle, x []float64, y []float64, fct Func3d) error {
 	if len(x) != len(y) {
 		return &gnuplotError{fmt.Sprintf("The length of the x-axis array and y-axis array are not same.")}
 	}
