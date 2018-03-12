@@ -139,7 +139,7 @@ func (plot *Plot) SetLogscale(axis string, base int) error {
 //  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
 //  plot.SetTitle("Test Results")
 // 	plot.SetYrange(-2,2)
-func (plot *Plot) SetYrange(start, end int) error {
+func (plot *Plot) SetYrange(start int, end int) error {
 	return plot.Cmd(fmt.Sprintf("set yrange [%d:%d]", start, end))
 }
 
@@ -174,22 +174,7 @@ func (plot *Plot) SavePlot(filename string) (err error) {
 	if plot.nplots == 0 {
 		return &gnuplotError{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
 	}
-	outputFormat := "set terminal " + plot.format.String()
-	fmt.Printf("outputFormat: %s\n", outputFormat)
-	plot.CheckedCmd(outputFormat)
-	outputFileCommand := "set output " + "'" + filename + "'"
-	fmt.Printf("outputFileCommand: %s\n", outputFileCommand)
-	plot.CheckedCmd(outputFileCommand)
-	plot.CheckedCmd("replot  ")
-	return nil
-}
-
-func (plot *Plot) SaveHistogram(filename string) (err error) {
-	if plot.nplots == 0 {
-		return &gnuplotError{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
-	}
-	plot.style = Histogram
-	outputFormat := "set terminal " + plot.format.String()
+	outputFormat := "set terminal " + plot.format
 	plot.CheckedCmd(outputFormat)
 	outputFileCommand := "set output" + "'" + filename + "'"
 	plot.CheckedCmd(outputFileCommand)
@@ -211,9 +196,9 @@ func (plot *Plot) SaveHistogram(filename string) (err error) {
 // 	plot.SetFormat("pdf")
 //  plot.SavePlot("1.pdf")
 // NOTE: png is default format for saving files.
-func (plot *Plot) SetFormat(newformat PlotFormat) error {
-	allowed := []PlotFormat{
-		Png, Pdf}
+func (plot *Plot) SetFormat(newformat string) error {
+	allowed := []string{
+		"png", "pdf"}
 	for _, s := range allowed {
 		if newformat == s {
 			plot.format = newformat

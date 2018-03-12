@@ -73,9 +73,7 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 	if plot.debug {
 		//buf := new(bytes.Buffer)
 		//io.Copy(buf, plot.proc.handle.Stdout)
-		fmt.Printf("fmt> %v\n", format)
-		fmt.Printf("a>   %v\n", a)
-		fmt.Printf("cmd> %v\n", cmd)
+		fmt.Printf("cmd> %v", cmd)
 		fmt.Printf("res> %v\n", n)
 	}
 	return err
