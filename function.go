@@ -38,7 +38,11 @@ func (plot *Plot) AddFunc2d(name string, style PointStyle, x []float64, fct Func
 	combined := [][]float64{}
 	combined = append(combined, x)
 	combined = append(combined, y)
-	plot.AddPointGroup(name, style, combined)
+	curve, err := plot.AddPointGroup(name, style, combined)
+	if err != nil {
+		return &gnuplotError{err.Error()}
+	}
+	plot.plotXY(curve)
 	return nil
 }
 
@@ -79,6 +83,10 @@ func (plot *Plot) AddFunc3d(name string, style PointStyle, x []float64, y []floa
 	combined = append(combined, x)
 	combined = append(combined, y)
 	combined = append(combined, z)
-	plot.AddPointGroup(name, style, combined)
+	curve, err := plot.AddPointGroup(name, style, combined)
+	if err != nil {
+		return &gnuplotError{err.Error()}
+	}
+	plot.plotXYZ(curve)
 	return nil
 }

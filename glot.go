@@ -62,6 +62,8 @@ const (
 	Pdf = iota
 	// Png is a png output format
 	Png
+	// Svg is a svg output format
+	Svg
 )
 
 // PointStyle specifies which style to use for plotting a set of points.
@@ -102,8 +104,10 @@ func (pf PlotFormat) String() string {
 		return "pdf"
 	case Png:
 		return "png"
+	case Svg:
+		return "svg"
 	default:
-		return "unsupported"
+		return "pdf"
 	}
 }
 
