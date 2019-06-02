@@ -60,6 +60,10 @@ func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
 		return nil, &gnuplotError{fmt.Sprintf("invalid number of dims '%v'", dimensions)}
 	}
 	p.proc = proc
+
+	outputFormat := "set terminal unknown"
+	p.CheckedCmd(outputFormat)
+
 	return p, nil
 }
 
