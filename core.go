@@ -88,7 +88,7 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 	return err
 }
 
-// CheckedCmd is a convenience wrapper around Cmd: it will panic if the
+// CheckedCmd is a convenience wrapper around Cmd: it will error if the
 // error returned by Cmd isn't nil.
 // ex:
 //
@@ -97,8 +97,7 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 func (plot *Plot) CheckedCmd(format string, a ...interface{}) {
 	err := plot.Cmd(format, a...)
 	if err != nil {
-		errString := fmt.Sprintf("** err: %v\n", err)
-		panic(errString)
+		_ = fmt.Errorf("** err: %v\n", err)
 	}
 }
 
