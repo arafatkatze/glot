@@ -34,8 +34,8 @@ func init() {
 
 	gGnuplotCmd, err = exec.LookPath(gnuplotExecutableName)
 	if err != nil {
-		fmt.Printf("** could not find path to 'gnuplot':\n%v\n", err)
-		panic("could not find 'gnuplot'")
+		fmt.Errorf("** could not find path to 'gnuplot':\n%v\n", err)
+		fmt.Errorf("** set custom path to 'gnuplot' ")
 	}
 }
 
@@ -136,4 +136,8 @@ func (plot *Plot) ResetPlot() (err error) {
 	plot.cleanplot()
 	plot.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
 	return err
+}
+
+func SetCustomPathToGNUPlot(path string) {
+	gGnuplotCmd = path
 }
