@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 )
 
 var gGnuplotCmd string
@@ -24,7 +25,14 @@ func min(a, b int) int {
 // This raises an error if GNU plot is not installed
 func init() {
 	var err error
-	gGnuplotCmd, err = exec.LookPath("gnuplot")
+
+	gnuplotExecutableName := "gnuplot"
+
+	if runtime.GOOS == "windows" {
+		gnuplotExecutableName = "gnuplot.exe"
+	}
+
+	gGnuplotCmd, err = exec.LookPath(gnuplotExecutableName)
 	if err != nil {
 		fmt.Printf("** could not find path to 'gnuplot':\n%v\n", err)
 		panic("could not find 'gnuplot'")
@@ -62,11 +70,12 @@ func newPlotterProc(persist bool) (*plotterProcess, error) {
 // Cmd sends a command to the gnuplot subprocess and returns an error
 // if something bad happened in the gnuplot process.
 // ex:
-//   fname := "foo.dat"
-//   err := p.Cmd("plot %s", fname)
-//   if err != nil {
-//     panic(err)
-//   }
+//
+//	fname := "foo.dat"
+//	err := p.Cmd("plot %s", fname)
+//	if err != nil {
+//	  panic(err)
+//	}
 func (plot *Plot) Cmd(format string, a ...interface{}) error {
 	cmd := fmt.Sprintf(format, a...) + "\n"
 	n, err := io.WriteString(plot.proc.stdin, cmd)
@@ -82,8 +91,9 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 // CheckedCmd is a convenience wrapper around Cmd: it will panic if the
 // error returned by Cmd isn't nil.
 // ex:
-//   fname := "foo.dat"
-//   p.CheckedCmd("plot %s", fname)
+//
+//	fname := "foo.dat"
+//	p.CheckedCmd("plot %s", fname)
 func (plot *Plot) CheckedCmd(format string, a ...interface{}) {
 	err := plot.Cmd(format, a...)
 	if err != nil {
@@ -98,9 +108,10 @@ type tmpfilesDb map[string]*os.File
 // Close makes sure all resources used by the gnuplot subprocess are reclaimed.
 // This method is typically called when the Plotter instance is not needed
 // anymore. That's usually done via a defer statement:
-//   p, err := gnuplot.NewPlotter(...)
-//   if err != nil { /* handle error */ }
-//   defer p.Close()
+//
+//	p, err := gnuplot.NewPlotter(...)
+//	if err != nil { /* handle error */ }
+//	defer p.Close()
 func (plot *Plot) Close() (err error) {
 	if plot.proc != nil && plot.proc.handle != nil {
 		plot.proc.stdin.Close()
@@ -119,7 +130,8 @@ func (plot *Plot) cleanplot() (err error) {
 // ResetPlot is used to reset the whole plot.
 // This removes all the PointGroup's from the plot and makes it new.
 // Usage
-//  plot.ResetPlot()
+//
+//	plot.ResetPlot()
 func (plot *Plot) ResetPlot() (err error) {
 	plot.cleanplot()
 	plot.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
