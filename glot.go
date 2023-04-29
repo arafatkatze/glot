@@ -63,101 +63,139 @@ func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
 	return p, nil
 }
 
-func (plot *Plot) plotX(PointGroup *PointGroup) error {
-	f, err := ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
+func (plot *Plot) plotX(pg *PointGroup) error {
+	f, err := writePointsHelper(pg)
 	if err != nil {
 		return err
 	}
 	fname := f.Name()
 	plot.tmpfiles[fname] = f
-	for _, d := range PointGroup.castedData.([]float64) {
-		f.WriteString(fmt.Sprintf("%v\n", d))
-	}
-	f.Close()
 	cmd := plot.plotcmd
 	if plot.nplots > 0 {
 		cmd = plotCommand
 	}
-	if PointGroup.style == "" {
-		PointGroup.style = defaultStyle
+	if pg.style == "" {
+		pg.style = defaultStyle
 	}
 	var line string
-	if PointGroup.name == "" {
-		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, PointGroup.style)
+	if pg.name == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, pg.style)
 	} else {
 		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
-			cmd, fname, PointGroup.name, PointGroup.style)
+			cmd, fname, pg.name, pg.style)
 	}
 	plot.nplots++
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) plotXY(PointGroup *PointGroup) error {
-	x := PointGroup.castedData.([][]float64)[0]
-	y := PointGroup.castedData.([][]float64)[1]
-	npoints := min(len(x), len(y))
-
-	f, err := ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
+func (plot *Plot) plotXY(pg *PointGroup) error {
+	f, err := writePointsHelper(pg)
 	if err != nil {
 		return err
 	}
 	fname := f.Name()
 	plot.tmpfiles[fname] = f
-
-	for i := 0; i < npoints; i++ {
-		f.WriteString(fmt.Sprintf("%v %v\n", x[i], y[i]))
-	}
-
-	f.Close()
 	cmd := plot.plotcmd
 	if plot.nplots > 0 {
 		cmd = plotCommand
 	}
 
-	if PointGroup.style == "" {
-		PointGroup.style = "points"
+	if pg.style == "" {
+		pg.style = "points"
 	}
 	var line string
-	if PointGroup.name == "" {
-		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, PointGroup.style)
+	if pg.name == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, pg.style)
 	} else {
 		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
-			cmd, fname, PointGroup.name, PointGroup.style)
+			cmd, fname, pg.name, pg.style)
 	}
 	plot.nplots++
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) plotXYZ(points *PointGroup) error {
-	x := points.castedData.([][]float64)[0]
-	y := points.castedData.([][]float64)[1]
-	z := points.castedData.([][]float64)[2]
-	npoints := min(len(x), len(y))
-	npoints = min(npoints, len(z))
-	f, err := ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
+func (plot *Plot) plotXYZ(pg *PointGroup) error {
+	f, err := writePointsHelper(pg)
 	if err != nil {
 		return err
 	}
 	fname := f.Name()
 	plot.tmpfiles[fname] = f
-
-	for i := 0; i < npoints; i++ {
-		f.WriteString(fmt.Sprintf("%v %v %v\n", x[i], y[i], z[i]))
-	}
-
-	f.Close()
 	cmd := "splot" // Force 3D plot
 	if plot.nplots > 0 {
 		cmd = plotCommand
 	}
 
 	var line string
-	if points.name == "" {
-		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, points.style)
+	if pg.name == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, pg.style)
 	} else {
 		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
-			cmd, fname, points.name, points.style)
+			cmd, fname, pg.name, pg.style)
 	}
 	plot.nplots++
 	return plot.Cmd(line)
+}
+
+func writePointsHelper(points *PointGroup) (f *os.File, err error) {
+	var npoints int // number of records to write to file
+	var pointString string
+	f, err = ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	switch points.dimensions {
+	case 1:
+		x := points.castedData.([][]float64)[0]
+		npoints = len(x)
+		for i := 0; i < npoints; i++ {
+			pointString += fmt.Sprintf("%v\n", x[i])
+			if i%10000 == 0 { // flush every 10,000 lines
+				f.WriteString(pointString)
+				pointString = ""
+			}
+		}
+		f.WriteString(pointString)
+	case 2:
+		x := points.castedData.([][]float64)[0]
+		y := points.castedData.([][]float64)[1]
+		npoints = minValue(len(x), len(y))
+		for i := 0; i < npoints; i++ {
+			pointString += fmt.Sprintf("%v %v\n", x[i], y[i])
+			if i%10000 == 0 { // flush every 10,000 lines
+				f.WriteString(pointString)
+				pointString = ""
+			}
+		}
+		f.WriteString(pointString)
+	case 3:
+		x := points.castedData.([][]float64)[0]
+		y := points.castedData.([][]float64)[1]
+		z := points.castedData.([][]float64)[2]
+		npoints = minValue(len(x), len(y), len(z))
+		for i := 0; i < npoints; i++ {
+			pointString += fmt.Sprintf("%v %v %v\n", x[i], y[i], z[i])
+			if i%10000 == 0 { // flush every 10,000 lines
+				f.WriteString(pointString)
+				pointString = ""
+			}
+		}
+		f.WriteString(pointString)
+	default:
+		return nil, &gnuplotError{
+			fmt.Sprintf("invalid number of dims '%v'", points.dimensions),
+		}
+	}
+	return
+}
+
+func minValue(n ...int) int {
+	v := n[0]
+	for i := 1; i < len(n); i++ {
+		if n[i] < v {
+			v = n[i] // swap in smaller value
+		}
+	}
+	return v
 }
