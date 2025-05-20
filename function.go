@@ -82,3 +82,45 @@ func (plot *Plot) AddFunc3d(name string, style string, x []float64, y []float64,
 	plot.AddPointGroup(name, style, combined)
 	return nil
 }
+
+// CalculateSMA calculates the Simple Moving Average (SMA) for a given data series.
+//
+// Parameters:
+//   data: A slice of float64 representing the input data series.
+//   windowSize: An integer representing the number of data points to include in the SMA calculation.
+//
+// Returns:
+//   A slice of float64 representing the calculated SMA values.
+//   The returned slice will be shorter than the input data slice by `windowSize - 1`.
+//   Returns an empty slice if:
+//     - `data` is empty.
+//     - `windowSize` is less than or equal to 0.
+//     - `windowSize` is greater than the length of `data`.
+//
+// Example:
+//   data = [1, 2, 3, 4, 5], windowSize = 3
+//   Result: [2, 3, 4]
+//     SMA[0] = (1+2+3)/3 = 2
+//     SMA[1] = (2+3+4)/3 = 3
+//     SMA[2] = (3+4+5)/3 = 4
+func CalculateSMA(data []float64, windowSize int) []float64 {
+	// Handle edge cases
+	if len(data) == 0 || windowSize <= 0 || windowSize > len(data) {
+		return []float64{}
+	}
+
+	// The number of SMA values that can be calculated
+	numSMAPoints := len(data) - windowSize + 1
+	smaValues := make([]float64, numSMAPoints)
+
+	// Calculate SMA for each window
+	for i := 0; i < numSMAPoints; i++ {
+		sum := 0.0
+		for j := 0; j < windowSize; j++ {
+			sum += data[i+j]
+		}
+		smaValues[i] = sum / float64(windowSize)
+	}
+
+	return smaValues
+}
